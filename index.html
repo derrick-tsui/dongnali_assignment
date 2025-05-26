@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dear Zoo Read-Along</title>
+<style>
+  body { font-family: sans-serif; max-width: 800px; margin: 40px auto; line-height: 1.5; }
+  #transcript { margin-top: 20px; font-size: 1.2em; }
+  #transcript span { padding: 2px 4px; margin-right: 2px; transition: background-color 0.2s; }
+  .highlight { background-color: yellow; }
+</style>
+</head>
+<body>
+
+<h1>Dear Zoo - Read-Along</h1>
+<audio id="audio" controls>
+  <source src="dear_zoo_audio.m4a" type="audio/m4a">
+  Your browser does not support the audio element.
+</audio>
+
+<div id="transcript"></div>
+
+<script>
+const transcriptData = [
+  { word: "I", start: 0.33, end: 0.47 },
+  { word: "wrote", start: 0.47, end: 0.78 },
+  { word: "to", start: 0.92, end: 1.09 },
+  { word: "the", start: 1.09, end: 1.20 },
+  { word: "zoo", start: 1.20, end: 1.73 },
+  { word: "to", start: 2.22, end: 2.35 },
+  { word: "send", start: 2.35, end: 2.75 },
+  { word: "me", start: 2.75, end: 2.92 },
+  { word: "a", start: 2.92, end: 3.02 },
+  { word: "pet.", start: 3.14, end: 3.54 },
+  { word: "They", start: 5.14, end: 5.34 },
+  { word: "sent", start: 5.34, end: 5.99 },
+  { word: "me", start: 5.99, end: 6.28 },
+  { word: "an", start: 6.40, end: 6.65 },
+  { word: "elephant.", start: 10.27, end: 11.00 },
+  { word: "He", start: 12.41, end: 12.58 },
+  { word: "was", start: 12.58, end: 12.87 },
+  { word: "too", start: 12.87, end: 13.15 },
+  { word: "big.", start: 13.39, end: 13.93 },
+  { word: "I", start: 15.59, end: 15.71 },
+  { word: "sent", start: 15.71, end: 16.13 },
+  { word: "him", start: 16.13, end: 16.38 },
+  { word: "back.", start: 16.44, end: 16.82 },
+  { word: "So", start: 19.53, end: 19.80 },
+  { word: "they", start: 19.80, end: 19.99 },
+  { word: "sent", start: 19.99, end: 20.38 },
+  { word: "me", start: 20.38, end: 20.71 },
+  { word: "a", start: 20.88, end: 21.17 },
+  { word: "Giraffe.", start: 24.51, end: 25.35 },
+  { word: "He", start: 26.84, end: 27.04 },
+  { word: "was", start: 27.04, end: 27.26 },
+  { word: "too", start: 27.26, end: 27.47 },
+  { word: "tall.", start: 27.57, end: 28.18 },
+  { word: "I", start: 29.53, end: 29.63 },
+  { word: "sent", start: 29.63, end: 30.12 },
+  { word: "him", start: 30.12, end: 30.36 },
+  { word: "back.", start: 30.36, end: 30.73 },
+  { word: "So", start: 33.10, end: 33.38 },
+  { word: "they", start: 33.38, end: 33.57 },
+  { word: "sent", start: 33.57, end: 33.92 },
+  { word: "me", start: 33.92, end: 34.24 },
+  { word: "a", start: 34.41, end: 34.69 },
+  { word: "lion.", start: 39.71, end: 40.25 },
+  { word: "He", start: 41.93, end: 42.08 },
+  { word: "was", start: 42.08, end: 42.30 },
+  { word: "too", start: 42.30, end: 42.50 },
+  { word: "fierce.", start: 42.50, end: 43.33 },
+  { word: "I", start: 44.59, end: 44.73 },
+  { word: "sent", start: 44.73, end: 45.11 },
+  { word: "him", start: 45.13, end: 45.39 },
+  { word: "back.", start: 45.39, end: 45.75 },
+  { word: "So", start: 48.21, end: 48.52 },
+  { word: "they", start: 48.52, end: 48.72 },
+  { word: "sent", start: 48.72, end: 49.11 },
+  { word: "me", start: 49.19, end: 49.46 },
+  { word: "a", start: 49.63, end: 49.86 },
+  { word: "camel.", start: 52.75, end: 53.33 },
+  { word: "He", start: 54.61, end: 54.85 },
+  { word: "was", start: 54.85, end: 55.12 },
+  { word: "too", start: 55.12, end: 55.39 },
+  { word: "grumpy.", start: 55.69, end: 56.20 },
+  { word: "I", start: 57.12, end: 57.36 },
+  { word: "sent", start: 57.36, end: 57.94 },
+  { word: "him", start: 58.00, end: 58.24 },
+  { word: "back.", start: 58.43, end: 58.83 },
+  { word: "So", start: 61.05, end: 61.45 },
+  { word: "they", start: 61.45, end: 61.66 },
+  { word: "sent", start: 61.66, end: 62.08 },
+  { word: "me", start: 62.08, end: 62.45 },
+  { word: "a", start: 62.63, end: 62.88 },
+  { word: "snake.", start: 65.93, end: 67.20 },
+  { word: "He", start: 69.03, end: 69.24 },
+  { word: "was", start: 69.24, end: 69.52 },
+  { word: "too", start: 69.52, end: 69.71 },
+  { word: "scary.", start: 69.71, end: 70.92 },
+  { word: "I", start: 72.48, end: 72.65 },
+  { word: "sent", start: 72.65, end: 73.06 },
+  { word: "him", start: 73.06, end: 73.24 },
+  { word: "back.", start: 73.24, end: 73.70 },
+  { word: "So", start: 76.81, end: 77.07 },
+  { word: "they", start: 77.07, end: 77.29 },
+  { word: "sent", start: 77.29, end: 77.79 },
+  { word: "me", start: 77.79, end: 78.09 },
+  { word: "a", start: 78.28, end: 78.53 },
+  { word: "monkey.", start: 82.09, end: 82.87 },
+  { word: "He", start: 84.13, end: 84.25 },
+  { word: "was", start: 84.25, end: 84.48 },
+  { word: "too", start: 84.48, end: 84.72 },
+  { word: "naughty.", start: 84.72, end: 85.35 },
+  { word: "I", start: 86.62, end: 86.82 },
+  { word: "sent", start: 86.82, end: 87.25 },
+  { word: "him", start: 87.25, end: 87.67 },
+  { word: "back.", start: 87.67, end: 88.04 },
+  { word: "So", start: 90.30, end: 90.63 },
+  { word: "they", start: 90.63, end: 90.83 },
+  { word: "sent", start: 90.83, end: 91.25 },
+  { word: "me", start: 91.25, end: 91.61 },
+  { word: "a", start: 91.86, end: 92.12 },
+  { word: "frog.", start: 96.19, end: 96.87 },
+  { word: "He", start: 98.21, end: 98.40 },
+  { word: "was", start: 98.40, end: 98.65 },
+  { word: "too", start: 98.65, end: 98.91 },
+  { word: "jumpy.", start: 99.09, end: 99.59 },
+  { word: "I", start: 101.02, end: 101.18 },
+  { word: "sent", start: 101.18, end: 101.70 },
+  { word: "him", start: 101.75, end: 101.99 },
+  { word: "back,", start: 101.99, end: 102.40 },
+  { word: "so", start: 104.33, end: 104.58 },
+  { word: "they", start: 104.58, end: 104.80 },
+  { word: "thought", start: 104.80, end: 105.16 },
+  { word: "very", start: 105.35, end: 105.78 },
+  { word: "hard", start: 105.78, end: 106.33 },
+  { word: "and", start: 108.04, end: 108.22 },
+  { word: "sent", start: 108.22, end: 108.62 },
+  { word: "me", start: 108.68, end: 109.01 },
+  { word: "a", start: 109.13, end: 109.38 },
+  { word: "puppy.", start: 112.37, end: 112.99 },
+  { word: "He", start: 114.09, end: 114.22 },
+  { word: "was", start: 114.22, end: 114.41 },
+  { word: "perfect,", start: 114.41, end: 115.08 },
+  { word: "I", start: 116.16, end: 116.29 },
+  { word: "kept", start: 116.42, end: 116.73 },
+  { word: "him.", start: 116.73, end: 116.95 },
+
+];
+
+const transcriptContainer = document.getElementById('transcript');
+transcriptData.forEach((item, index) => {
+  const span = document.createElement('span');
+  span.textContent = item.word;
+  span.id = `word-${index}`;
+  transcriptContainer.appendChild(span);
+});
+
+const audio = document.getElementById('audio');
+audio.ontimeupdate = () => {
+  const currentTime = audio.currentTime;
+  transcriptData.forEach((item, index) => {
+    const span = document.getElementById(`word-${index}`);
+    if (currentTime >= item.start && currentTime <= item.end) {
+      span.classList.add('highlight');
+    } else {
+      span.classList.remove('highlight');
+    }
+  });
+};
+</script>
+
+</body>
+</html>
