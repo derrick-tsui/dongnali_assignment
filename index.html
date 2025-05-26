@@ -8,28 +8,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   body {
-  font-family: 'Nunito', sans-serif;
-  background-color: #fefac8;
-   text-align: center;
-  padding: 20px;
-}
+    font-family: 'Nunito', sans-serif;
+    background-color: #fefac8;
+    text-align: center;
+    padding: 20px;
+  }
 
-#content-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-#header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  #content-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  #header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* ensure header wraps on smaller screens */
+  }
+
   #logo {
     width: 120px;
     height: auto;
     margin-right: 20px;
   }
-    nav {
+
+  nav {
     margin-left: auto;
     display: flex;
     gap: 10px;
@@ -49,20 +53,46 @@
     color: #fff;
   }
 
+  /* Responsive header and title for smaller screens */
+  @media (max-width: 600px) {
+    #header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #header h1 {
+      margin: 10px 0;
+      font-size: 1.5em;
+    }
+
+    nav {
+      margin-left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .nav-button {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
   #sentence { opacity: 0; transition: opacity 0.5s; font-size: 2em; line-height: 1.5; text-align: center; }
   #sentence.active { opacity: 1; }
   #sentence span { padding: 4px 8px; margin: 4px; display: inline-block; border-radius: 8px; transition: background-color 0.3s, transform 0.2s; }
   .highlight { background-color: #ffeb3b; transform: scale(1.1); font-weight: bold; text-decoration: underline; }
   #image-container { margin-top: 20px; text-align: center; }
- #image-container img {
-  width: 100%;
-  max-width: 600px;
-  max-height: 450px; /* NEW: limit height for better fitting */
-  object-fit: contain; /* ensures aspect ratio is preserved */
-  border-radius: 10px;
-  cursor: pointer;
-  transition: opacity 0.5s;
-}
+  #image-container img {
+    width: 100%;
+    max-width: 600px;
+    max-height: 450px;
+    object-fit: contain;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.5s;
+  }
   audio { width: 100%; margin-top: 20px; }
 </style>
 </head>
