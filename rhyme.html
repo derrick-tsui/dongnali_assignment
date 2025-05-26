@@ -20,6 +20,7 @@
     align-items: center;
     padding: 20px;
     background-color: #fefac8;
+    flex-wrap: wrap; /* ensure header wraps on smaller screens */
   }
 
   #logo {
@@ -48,6 +49,32 @@
     color: #fff;
   }
 
+  /* Responsive header and title for smaller screens */
+  @media (max-width: 600px) {
+    #header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #header h1 {
+      margin: 10px 0;
+      font-size: 1.5em;
+    }
+
+    nav {
+      margin-left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .nav-button {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
   h1 {
     margin-bottom: 20px;
   }
@@ -72,7 +99,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-     cursor: pointer;
+    cursor: pointer;
   }
 
   .image-container img {
