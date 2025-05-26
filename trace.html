@@ -12,37 +12,66 @@
     text-align: center;
     padding: 20px;
   }
-#header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
 
-#header nav {
-  margin-left: auto;
-  display: flex;
-  gap: 10px;
-}
+  #header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* ensure header wraps on smaller screens */
+  }
 
-.nav-button {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background-color: #ebb495; /* From uploaded color */
-  color: #333; /* Match the logo text color */
-  text-decoration: none;
-  font-weight: 600;
-}
+  #logo {
+    width: 120px;
+    height: auto;
+    margin-right: 20px;
+  }
 
-.nav-button.active {
-  background-color: #333; /* Different highlight color for active page */
-  color: #fff;
-}
+  #header nav {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+  }
 
-#logo {
-  width: 120px;
-  height: auto;
-  margin-right: 20px;
-}
+  .nav-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #ebb495; /* from uploaded color */
+    color: #333; /* Match the logo text color */
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .nav-button.active {
+    background-color: #333;
+    color: #fff;
+  }
+
+  /* Responsive header and title for smaller screens */
+  @media (max-width: 600px) {
+    #header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #header h1 {
+      margin: 10px 0;
+      font-size: 1.5em;
+    }
+
+    #header nav {
+      margin-left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .nav-button {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
   #randomizerBtn {
     padding: 10px 20px;
     font-size: 1.2em;
@@ -84,25 +113,27 @@
     border: 4px solid red;
   }
 
-.letter-bg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  color: rgba(0, 0, 0, 0.6);
-  font-weight: 900;
-  pointer-events: none;
-}
+  .letter-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 900;
+    pointer-events: none;
+  }
 
   #tracingContainer {
     margin-top: 20px;
   }
-.letter-container {
-  font-size: 50px;
-  font-weight: 900;
-  margin-bottom: 4px;
-}
+
+  .letter-container {
+    font-size: 50px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+
   #tracingCanvas {
     border: 2px solid #333;
     border-radius: 8px;
