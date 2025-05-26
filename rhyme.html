@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhyming Game - Connect the Dots</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #fefac8;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  #header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #fefac8;
+  }
+
+  #logo {
+    width: 120px;
+    height: auto;
+    margin-right: 20px;
+  }
+
+  nav {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+  }
+
+  .nav-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #ebb495;
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .nav-button.active {
+    background-color: #333;
+    color: #fff;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    flex: 1;
+  }
+
+  .image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+     cursor: pointer;
+  }
+
+  .image-container img {
+    height: 150px;
+    width: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .dot {
+    width: 15px;
+    height: 15px;
+    background-color: black;
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 250, 200, 0.95);
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 3em;
+    font-weight: bold;
+  }
+
+  #restartBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    background-color: #ffa500;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <img id="logo" src="miss_donna_logo.png" alt="Miss Donna Logo">
+  <h1>Match the rhyming words</h1>
+  <nav>
+    <a href="read.html" class="nav-button">Read</a>
+    <a href="trace.html" class="nav-button">Trace</a>
+    <a href="rhyme.html" class="nav-button active">Rhyme</a>
+  </nav>
+</div>
+<div class="container" id="gameContainer">
+  <canvas id="lineCanvas"></canvas>
+
+  <div class="column left"></div>
+  <div class="column right"></div>
+</div>
+
+<div id="overlay">
+  GREAT WORK!
+  <button id="restartBtn">Play Again</button>
+</div>
+
+<script>
+const canvas = document.getElementById('lineCanvas');
+const ctx = canvas.getContext('2d');
+const gameContainer = document.getElementById('gameContainer');
+const overlay = document.getElementById('overlay');
+const restartBtn = document.getElementById('restartBtn');
+
+canvas.width = gameContainer.offsetWidth;
+canvas.height = gameContainer.offsetHeight;
+
+const rhymePairs = {
+  'frog': 'log',
+  'snake': 'cake',
+  'monkey': 'donkey'
+};
+
+const leftImages = ['frog_2.png', 'snake_2.png', 'monkey_2.png'];
+const rightImages = ['donkey_2.png', 'cake_2.png', 'log_2.png'];
+
+let startDot = null;
+let lines = [];
+
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function populateColumns() {
+  const leftColumn = document.querySelector('.left');
+  const rightColumn = document.querySelector('.right');
+
+  leftColumn.innerHTML = '';
+  rightColumn.innerHTML = '';
+
+  const shuffledLeft = shuffleArray([...leftImages]);
+  const shuffledRight = shuffleArray([...rightImages]);
+
+  shuffledLeft.forEach(name => {
+    const container = document.createElement('div');
+    container.classList.add('image-container');
+    container.innerHTML = `
+      <img src="${name}" alt="${name.split('_')[0]}">
+      <div class="dot" data-word="${name.split('_')[0]}"></div>
+    `;
+    leftColumn.appendChild(container);
+  });
+
+  shuffledRight.forEach(name => {
+    const container = document.createElement('div');
+    container.classList.add('image-container');
+    container.innerHTML = `
+      <div class="dot" data-word="${name.split('_')[0]}"></div>
+      <img src="${name}" alt="${name.split('_')[0]}">
+    `;
+    rightColumn.appendChild(container);
+  });
+  canvas.width = gameContainer.offsetWidth;
+canvas.height = gameContainer.offsetHeight;
+}
+
+function getDotCenter(dot) {
+  const rect = dot.getBoundingClientRect();
+  const containerRect = gameContainer.getBoundingClientRect();
+  return {
+    x: rect.left + rect.width / 2 - containerRect.left,
+    y: rect.top + rect.height / 2 - containerRect.top,
+    word: dot.dataset.word
+  };
+}
+
+function drawLines() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  lines.forEach(line => {
+    ctx.strokeStyle = line.color;
+    ctx.lineWidth = 15;
+    ctx.beginPath();
+    ctx.moveTo(line.start.x, line.start.y);
+    ctx.lineTo(line.end.x, line.end.y);
+    ctx.stroke();
+  });
+}
+
+function attachDotListeners() {
+const leftContainers = document.querySelectorAll('.left .image-container');
+const rightContainers = document.querySelectorAll('.right .image-container');
+
+leftContainers.forEach(container => {
+  container.addEventListener('click', () => {
+    const dot = container.querySelector('.dot');
+    const startWord = dot.dataset.word;
+    lines = lines.filter(line => !(line.color === 'red' && line.start.word === startWord));
+    drawLines();
+    startDot = dot;
+  });
+});
+
+rightContainers.forEach(container => {
+  container.addEventListener('click', () => {
+    if (!startDot) return;
+    const dot = container.querySelector('.dot');
+    const startWord = startDot.dataset.word;
+    const endWord = dot.dataset.word;
+
+    const startCenter = getDotCenter(startDot);
+    const endCenter = getDotCenter(dot);
+
+    let color = 'red';
+    let isCorrect = false;
+    if (rhymePairs[startWord] === endWord) {
+      color = 'green';
+      isCorrect = true;
+      startDot.style.pointerEvents = 'none';
+    }
+
+    const audio = new Audio(isCorrect ? 'sounds/correct.mp3' : 'sounds/incorrect.mp3');
+    audio.play();
+
+    const newLine = { start: startCenter, end: endCenter, color, start: { ...startCenter, word: startWord } };
+    lines.push(newLine);
+    drawLines();
+
+    if (!isCorrect) {
+      setTimeout(() => {
+        lines = lines.filter(line => line !== newLine);
+        drawLines();
+      }, 3000);
+    }
+
+    const greenLines = lines.filter(line => line.color === 'green');
+    if (greenLines.length === 3) {
+      setTimeout(() => {
+        gameContainer.style.opacity = '0';
+        overlay.style.display = 'flex';
+      }, 500);
+    }
+
+    startDot = null;
+  });
+});
+}
+
+function attachImageSounds() {
+  const images = document.querySelectorAll('.image-container img');
+  images.forEach(img => {
+    img.addEventListener('click', () => {
+      const baseName = img.alt;
+      const audio = new Audio('sounds/' + baseName + '.mp3');
+      audio.play();
+    });
+  });
+}
+
+restartBtn.addEventListener('click', () => {
+  lines = [];
+  drawLines();
+  overlay.style.display = 'none';
+  gameContainer.style.opacity = '1';
+  populateColumns();
+  attachDotListeners();
+  attachImageSounds();
+});
+
+populateColumns();
+attachDotListeners();
+attachImageSounds();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animal Rhyme & Tracing</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #fefac8;
+    text-align: center;
+    padding: 20px;
+  }
+#header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#header nav {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.nav-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #ebb495; /* From uploaded color */
+  color: #333; /* Match the logo text color */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-button.active {
+  background-color: #333; /* Different highlight color for active page */
+  color: #fff;
+}
+
+#logo {
+  width: 120px;
+  height: auto;
+  margin-right: 20px;
+}
+  #randomizerBtn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #ffa500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .grid-item {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .grid-item img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    height: auto;
+    display: block;
+  }
+
+  .grid-item.correct {
+    border: 4px solid lightgreen;
+  }
+
+  .grid-item.wrong {
+    border: 4px solid red;
+  }
+
+.letter-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 900;
+  pointer-events: none;
+}
+
+  #tracingContainer {
+    margin-top: 20px;
+  }
+.letter-container {
+  font-size: 50px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+  #tracingCanvas {
+    border: 2px solid #333;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    touch-action: none; /* for iPad */
+  }
+</style>
+</head>
+<body>
+<div id="header">
+  <img id="logo" src="miss_donna_logo.png" alt="Miss Donna Logo">
+  <h1>Say and Trace the Letter!</h1>
+  <nav>
+    <a href="read.html" class="nav-button">Read</a>
+    <a href="trace.html" class="nav-button active">Trace</a>
+    <a href="rhyme.html" class="nav-button">Rhyme</a>
+  </nav>
+</div>
+<button id="randomizerBtn">Start</button>
+
+<div class="grid">
+  <div class="grid-item" data-word="elephant">
+    <div class="letter-container">E</div>
+    <img src="elephant_2.png" alt="elephant">
+  </div>
+  <div class="grid-item" data-word="giraffe">
+    <div class="letter-container">G</div>
+    <img src="giraffe_2.png" alt="giraffe">
+  </div>
+  <div class="grid-item" data-word="lion">
+    <div class="letter-container">L</div>
+    <img src="lion_2.png" alt="lion">
+  </div>
+  <div class="grid-item" data-word="frog">
+    <div class="letter-container">F</div>
+    <img src="frog_2.png" alt="frog">
+  </div>
+  <div class="grid-item" data-word="snake">
+    <div class="letter-container">S</div>
+    <img src="snake_2.png" alt="snake">
+  </div>
+  <div class="grid-item" data-word="monkey">
+    <div class="letter-container">M</div>
+    <img src="monkey_2.png" alt="monkey">
+  </div>
+  <div class="grid-item" data-word="puppy">
+    <div class="letter-container">P</div>
+    <img src="puppy_2.png" alt="puppy">
+  </div>
+  <div class="grid-item" data-word="camel">
+    <div class="letter-container">C</div>
+    <img src="camel_2.png" alt="camel">
+  </div>
+</div>
+
+<div id="tracingContainer">
+  <canvas id="tracingCanvas" width="600" height="200"></canvas>
+</div>
+
+<audio id="tryAgainSound" src="try_again.mp3"></audio>
+<audio id="wellDoneSound" src="well_done.mp3"></audio>
+
+<script>
+const randomizerBtn = document.getElementById('randomizerBtn');
+const gridItems = document.querySelectorAll('.grid-item');
+const canvas = document.getElementById('tracingCanvas');
+const ctx = canvas.getContext('2d');
+
+let flickerInterval = null;
+let selectedAnimal = null;
+
+// Animal list
+const animals = [
+  { word: 'elephant', letter: 'E' },
+  { word: 'giraffe', letter: 'G' },
+  { word: 'lion', letter: 'L' },
+  { word: 'frog', letter: 'F' },
+  { word: 'snake', letter: 'S' },
+  { word: 'monkey', letter: 'M' },
+  { word: 'puppy', letter: 'P' },
+  { word: 'camel', letter: 'C' }
+];
+
+// Drawing logic
+let drawing = false;
+
+const startDrawing = (e) => {
+  drawing = true;
+  draw(e);
+};
+
+const stopDrawing = () => {
+  drawing = false;
+  ctx.beginPath();
+};
+
+const draw = (e) => {
+  if (!drawing) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.touches ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+  const y = e.touches ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#000000'; // pink trail
+
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+};
+
+// Mouse & touch events
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('touchstart', startDrawing);
+canvas.addEventListener('touchend', stopDrawing);
+canvas.addEventListener('touchmove', draw);
+
+// Randomizer logic
+randomizerBtn.onclick = () => {
+  if (flickerInterval) return;
+
+  let idx = 0;
+  const images = Array.from(gridItems);
+
+  // Clear any previous highlights (correct/wrong borders)
+  images.forEach(el => {
+    el.classList.remove('correct', 'wrong');
+    el.style.outline = 'none';
+    el.style.opacity = '1';
+  });
+
+  // Clear the drawing canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  flickerInterval = setInterval(() => {
+    images.forEach(el => el.style.opacity = '0.3');
+    images[idx % images.length].style.opacity = '1';
+    idx++;
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(flickerInterval);
+    flickerInterval = null;
+
+    // Pick final animal
+    selectedAnimal = animals[Math.floor(Math.random() * animals.length)];
+
+    // Make sure all images are fully visible
+    images.forEach(el => {
+      el.style.opacity = '1';
+      el.style.outline = 'none';
+    });
+
+    // Highlight the final selected animal
+    const selectedItem = Array.from(gridItems).find(el => el.dataset.word === selectedAnimal.word);
+    if (selectedItem) {
+      selectedItem.style.outline = '4px solid #ffa500';
+      selectedItem.style.borderRadius = '8px';
+    }
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw uppercase and lowercase letters side by side
+    ctx.font = '160px Nunito';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    const combined = selectedAnimal.letter.toUpperCase() + '    ' + selectedAnimal.letter.toLowerCase();
+    ctx.fillText(combined, canvas.width / 2, canvas.height / 2);
+
+    // Play the corresponding letter sound
+    const audioLetter = new Audio('sounds/' + selectedAnimal.letter.toLowerCase() + '.wav');
+    audioLetter.play();
+  }, 2000);
+};
+
+// NEW: Play letter sound on image click
+gridItems.forEach(item => {
+  item.onclick = () => {
+    const clickedWord = item.dataset.word;
+    const letter = clickedWord.charAt(0).toLowerCase();
+
+    // Play the corresponding letter's .wav file
+    const audioLetter = new Audio('sounds/' + letter + '.wav');
+    audioLetter.play();
+  };
+});
+</script>
+
+</body>
+</html>
